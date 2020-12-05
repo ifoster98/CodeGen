@@ -1,0 +1,1 @@
+type Weight = double

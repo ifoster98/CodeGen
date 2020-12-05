@@ -1,0 +1,76 @@
+using System;
+using System.Collections.Generic;
+using Ianf.{{typealias.modulename}}.Domain;
+using Xunit;
+
+namespace Ianf.{{typealias.modulename}}.UnitTest.Domain
+{
+    public class {{typealias.typename}}Tests
+    {
+        [Fact]
+        public void TestCreate{{typealias.typename}}()
+        {
+            // Assemble
+            var testValue = default({{typealias.propertytype}});
+ 
+            // Act
+            var newItem = {{typealias.typename}}.Create{{typealias.typename}}(testValue);
+ 
+            // Assert
+            newItem
+                .Match(
+                    None: () => Assert.True(false, "Expected successful creation."),
+                    Some: (s) => Assert.Equal(testValue, s.Value)
+                );
+        }
+ 
+        [Fact]
+        public void TestCreate{{typealias.typename}}Fail()
+        {
+            // Assemble
+            var testValue = default({{typealias.propertytype}});
+ 
+            // Act
+            var newItem = {{typealias.typename}}.Create{{typealias.typename}}(testValue);
+ 
+            // Assert
+            newItem
+                .Match(
+                    None: () => Assert.True(true),
+                    Some: (s) => Assert.True(false, "Expected no item to be created.")
+                );
+        }
+ 
+        [Fact]
+        public void TestCreate{{typealias.typename}}Equal()
+        {
+            // Assemble
+            var testFirstValue = default({{typealias.propertytype}});
+            var testSecondValue = default({{typealias.propertytype}});
+ 
+            // Act
+            var testFirstItem = {{typealias.typename}}.Create{{typealias.typename}}(testFirstValue);
+            var testSecondItem = {{typealias.typename}}.Create{{typealias.typename}}(testSecondValue);
+            var result = testFirstItem.Equals(testSecondItem);
+ 
+            // Assert
+            Assert.True(result);
+        }
+ 
+        [Fact]
+        public void TestCreate{{typealias.typename}}NotEqual()
+        {
+            // Assemble
+            var testFirstValue = default({{typealias.propertytype}});
+            var testSecondValue = default({{typealias.propertytype}});
+ 
+            // Act
+            var testFirstItem = {{typealias.typename}}.Create{{typealias.typename}}(testFirstValue);
+            var testSecondItem = {{typealias.typename}}.Create{{typealias.typename}}(testSecondValue);
+            var result = testFirstItem.Equals(testSecondItem);
+ 
+            // Assert
+            Assert.False(result);
+        }
+    }
+}

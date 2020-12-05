@@ -1,0 +1,23 @@
+using LanguageExt;
+using System;
+using System.Collections.Generic;
+using static LanguageExt.Prelude;
+
+namespace Ianf.{{typealias.modulename}}.Domain
+{
+    public struct {{typealias.typename}} : IEquatable<{{typealias.typename}}>
+    {
+        public {{typealias.propertytype}} Value { get; }
+
+        private {{typealias.typename}}({{typealias.propertytype}} {{typealias.lowername}}) => Value = {{typealias.lowername}};
+
+        public static Option<{{typealias.typename}}> Create{{typealias.typename}}({{typealias.propertytype}} {{typealias.lowername}}) =>
+            IsValid({{typealias.lowername}})
+                ? Some(new {{typealias.typename}}({{typealias.lowername}}))
+                : None;
+
+        private static bool IsValid({{typealias.propertytype}} {{typealias.lowername}}) => false;
+
+        public bool Equals({{typealias.typename}} other) => Value == other.Value;
+    }
+}
