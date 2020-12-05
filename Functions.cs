@@ -14,10 +14,10 @@ namespace CodeGen
     {
         public static string templateDirectory = "templates";
 
-        public static List<TypeAlias> ParseTypeAliases(string moduleName, string aliasFile) 
+        public static List<TypeAlias> ParseTypeAliases(AllOptions opts) 
         {
             var types = File
-                .ReadAllText(aliasFile)
+                .ReadAllText(opts.Source)
                 .Split('\n')
                 .Where(s => !string.IsNullOrEmpty(s))
                 .ToList();
@@ -36,9 +36,9 @@ namespace CodeGen
                 {
                     var propertyName = match.Groups["name"].Value;
                     var propertyType = match.Groups["type"].Value;
-                    return new TypeAlias(moduleName, propertyName, propertyType);
+                    return new TypeAlias(opts.Business, opts.Application, opts.Module, propertyName, propertyType);
                 }
-                return new TypeAlias(string.Empty, string.Empty, string.Empty);
+                return new TypeAlias(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
             }
         }
 
@@ -47,8 +47,12 @@ namespace CodeGen
                 .ParseText(File.ReadAllText(filename))
                 .GetRoot() as CompilationUnitSyntax;
 
-        private static void WriteFile(string directory, string typename, string contents) => 
-            File.WriteAllText($"{directory}{Path.DirectorySeparatorChar}{typename}.cs", contents);
+        private static void WriteFile(string directory, string typename, string contents) 
+        { 
+            var filename = $"{directory}/{Path.DirectorySeparatorChar}{typename}.cs";
+            if(!File.Exists(filename))
+                File.WriteAllText(filename, contents);
+        }
 
         private static string GetTemplate(string templateName) => 
             File.ReadAllText($"{templateDirectory}{Path.DirectorySeparatorChar}{templateName}.liquid");

@@ -8,12 +8,18 @@ using Microsoft.CodeAnalysis.Emit;
 
 namespace CodeGen
 {
-    class AllOptions {
+    public class AllOptions {
         [Option('s', "source", Required = true, HelpText = "Input file.")]
         public string Source { get; set; }
 
         [Option('o', "output", Required = false, Default = "./output", HelpText = "Output directory.")]
         public string OutputDirectory { get; set; }
+
+        [Option('b', "business", Required = true, HelpText = "Business Identifier")]
+        public string Business { get; set; }
+
+        [Option('a', "application", Required = true, HelpText = "Application Identifier")]
+        public string Application { get; set; }
 
         [Option('m', "module", Required = true, HelpText = "Module Identifier")]
         public string Module { get; set; }
@@ -30,8 +36,8 @@ namespace CodeGen
 
         private static int RunTypesAndReturnExitCode(AllOptions opts)
         {
-            var typeAliases = ParseTypeAliases(opts.Module, opts.Source);
-            var directories = ProjectStructure.CreateDirectories(opts.OutputDirectory, opts.Module);
+            var typeAliases = ParseTypeAliases(opts);
+            var directories = ProjectStructure.CreateDirectories(opts);
             GenerateTypeAliases(typeAliases, GetOutputDirectory(directories.DomainDirectory));
             GenerateTypeAliasesTests(typeAliases, GetOutputDirectory(directories.TestDirectory));
             return 0;

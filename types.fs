@@ -1,1 +1,1 @@
-type Weight = double
+type TestThing = int
