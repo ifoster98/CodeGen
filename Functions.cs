@@ -47,6 +47,26 @@ namespace CodeGen
                 .ParseText(File.ReadAllText(filename))
                 .GetRoot() as CompilationUnitSyntax;
 
+        public static List<RecordType> ParseRecordTypes(string moduleName, string dtoFile)
+        {
+            var contents = File.ReadAllText(dtoFile);
+            var syntaxTree = CSharpSyntaxTree.ParseText(contents);
+            var root = syntaxTree.GetRoot() as CompilationUnitSyntax;
+            var namespaceSyntax = root.Members.OfType<NamespaceDeclarationSyntax>().First();
+            return namespaceSyntax.Members.OfType<ClassDeclarationSyntax>()
+                .Select(pc => ParseClass(moduleName, pc))
+                .ToList();
+        }
+
+        public static RecordType ParseClass(string moduleName, ClassDeclarationSyntax programClassSyntax) {
+            var properties = programClassSyntax.Members.OfType<PropertyDeclarationSyntax>();
+            var entityName = programClassSyntax.Identifier.Text;
+            var props = properties
+                .Select(p => new PropertyDefinition(p.Identifier.Text, p.Type.ToString(), p.Type.ToString()))
+                .ToList();
+            return new RecordType(moduleName, entityName, props);
+        }
+
         private static void WriteFile(string directory, string typename, string contents) 
         { 
             var filename = $"{directory}/{Path.DirectorySeparatorChar}{typename}.cs";
@@ -59,6 +79,9 @@ namespace CodeGen
 
         private static string GenerateTypeAlias(string simpleTemplate, TypeAlias typeAlias) =>
             Template.ParseLiquid(simpleTemplate).Render(new { typealias = typeAlias });   
+
+        private static string GenerateRecordType(string recordTemplate, RecordType recordType) =>
+            Template.ParseLiquid(recordTemplate).Render(new { recordtype = recordType });   
 
         public static void GenerateTypeAliases(List<TypeAlias> typeAliass, string directory)
         {
@@ -76,6 +99,28 @@ namespace CodeGen
                 var typeAliasCode = GenerateTypeAlias(simpleTemplateTests, typeAlias);
                 WriteFile(directory, $"{typeAlias.Typename}Tests", typeAliasCode);
             });
+        }
+
+        public static void GenerateRecordTypes(
+            List<RecordType> recordTypes, 
+            string template, 
+            string filenamePattern,
+            string directory)
+        {
+            recordTypes.ForEach(recordType => {
+                GenerateRecordType(recordType, template, filenamePattern, directory);
+            });
+        }
+
+        public static void GenerateRecordType(
+            RecordType recordType, 
+            string template, 
+            string filenamePattern,
+            string directory)
+        {
+            var recordTemplate = GetTemplate(template);
+            var recordTypeCode = GenerateRecordType(recordTemplate, recordType);
+            WriteFile(directory, $"{recordType.Entityname}{filenamePattern}", recordTypeCode);
         }
     }
 }

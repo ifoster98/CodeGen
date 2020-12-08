@@ -1,0 +1,25 @@
+using System;
+using System.Collections.Generic;
+
+namespace Bes4.{{recordtype.modulename}}.BL.Domain
+{
+    public struct {{recordtype.entityname}} : IEquatable<{{recordtype.entityname}}>
+    { {% for entity in recordtype.entityproperties %}
+        public {{ entity.propertytype }} {{ entity.propertyname }} { get; }{% endfor %}
+
+        public {{recordtype.entityname}} ( {% for property in recordtype.entityproperties %}
+            {% if forloop.last != true %}{{ property.propertytype }} {{ property.propertynamelower }},{% else %}{{ property.propertytype }} {{ property.propertynamelower }}){% endif %}{% endfor %}
+        { {% for property in recordtype.entityproperties %}
+            {{ property.propertyname }} = {{ property.propertynamelower }};{% endfor %} 
+        }
+ 
+        public bool Equals({{recordtype.entityname}} other) => {% for property in recordtype.entityproperties %}
+            {% if forloop.last != true %}other.{{ property.propertyname }}.Equals({{ property.propertyname }}) && {% else %}other.{{ property.propertyname }}.Equals({{ property.propertyname }});{% endif %}{% endfor %}
+        {% for property in recordtype.entityproperties %}
+        public {{recordtype.entityname}} With{{property.propertyname}}({{property.propertytype}} {{property.propertynamelower}}) =>
+            new {{recordtype.entityname}}(
+                {% for prop in recordtype.entityproperties %}{% if forloop.last != true %}{{prop.propertynamelower}}: {% if prop.propertyname == property.propertyname %}{{prop.propertynamelower}}, {% else %}{{prop.propertyname}},{% endif %}
+                {% else %}{{prop.propertynamelower}}: {% if prop.propertyname == property.propertyname %}{{prop.propertynamelower}} {% else %}{{prop.propertyname}}{% endif %}{% endif %}{% endfor %}
+            );{% endfor %}
+    }
+}
